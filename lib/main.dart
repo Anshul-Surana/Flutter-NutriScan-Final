@@ -28,9 +28,11 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+
+  const MyHomePage({super.key, required this.title, this.passIndex = 0});
 
   final String title;
+  final int passIndex ;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -54,6 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    // set the initial index to passIndex
+    _currentIndex = widget.passIndex;
   }
     @override
     Widget build(BuildContext context) {

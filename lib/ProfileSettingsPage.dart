@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:new_app/UserProfilesDatabaseHelper.dart';
 import 'CategoryPage.dart';
 import 'ProfilePage.dart';
 import 'main.dart';
 
-class ProfileSettingsPage extends StatelessWidget {
+class ProfileSettingsPage extends StatefulWidget {
   final String initialName;
   final String? initialAvatarPath;
 
@@ -13,6 +14,34 @@ class ProfileSettingsPage extends StatelessWidget {
     required this.initialName,
     required this.initialAvatarPath,
   }) : super(key: key);
+
+  @override
+  State<ProfileSettingsPage> createState() => _ProfileSettingsPageState();
+}
+
+class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
+  String userName = 'User';
+  String? avatarImagePath;
+
+  Future<void> loadUserProfile() async {
+    try {
+      final userProfile = await UserProfilesDatabaseHelper.readUserProfile();
+      if (userProfile != null) {
+        setState(() {
+          userName = userProfile['name'] as String;
+          avatarImagePath = userProfile['avatarImagePath'] as String?;
+        });
+      }
+    } catch (e) {
+      print('Error loading user profile: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +67,15 @@ class ProfileSettingsPage extends StatelessWidget {
           children: <Widget>[
             CircleAvatar(
               radius: 50.0,
-              backgroundImage: initialAvatarPath != null
-                  ? FileImage(File(initialAvatarPath!))
-              as ImageProvider<Object>?
-                  : AssetImage('assets/blue.jpg'),
+              backgroundImage: 
+              avatarImagePath != null
+                  ? FileImage(File(avatarImagePath!))
+                  : AssetImage(widget.initialAvatarPath ?? 'assets/blue.jpg') as ImageProvider,
+
             ),
             SizedBox(height: 20.0),
             Text(
-              initialName,
+              userName,
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
@@ -59,7 +89,7 @@ class ProfileSettingsPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ProfilePage(
-                      initialName: initialName,
+                      initialName: widget.initialName,
                     ),
                   ),
                 );
