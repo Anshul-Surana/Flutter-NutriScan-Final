@@ -29,19 +29,71 @@ class _AnalysisPageState extends State<AnalysisPage> {
   late final _carbsTextcontroller;
   late final _sugarTextcontroller;
 
+  static const sodium = [
+    "sodium",
+    "sodlum",
+    "s0dium",
+    "s0dlum",
+    "5odium",
+    "5odlum",
+    "50dium",
+    "50dlum"
+  ];
+
+  static const sugar = ["sugar", "5ugar", "sucar", "5ucar"];
+
+  static const carbohydates = ["carbohydrates", "carbohydrate"];
+
+  double? extractQuantity(String string) {
+    RegExpMatch? match = RegExp(r'\d+\.\d+').firstMatch(string);
+    RegExpMatch? match2 = RegExp(r'\d+').firstMatch(string);
+    if (match != null) {
+      return double.parse(match.group(0)!);
+    } else if (match2 != null) {
+      return double.parse(match2.group(0)!);
+    } else {
+      return null;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    _sodiumTextcontroller =
-        TextEditingController(text: widget.tableExtractedText); // Initialize with the extracted text
-    _carbsTextcontroller = TextEditingController(text: '0'); // You can set the default value
-    _sugarTextcontroller = TextEditingController(text: '0'); // You can set the default value
+    
+    // create a array of all the words in the table text
+    List<String> tableWords = widget.tableExtractedText.split(' ');
+
+    // find sodium in the table text, get the index of the word and get the next double after it
+    int sodiumIndex = tableWords.indexWhere((element) => sodium.contains(element.toLowerCase()));
+    if (sodiumIndex != -1) {
+      _sodiumTextcontroller = TextEditingController(text: extractQuantity(tableWords[sodiumIndex + 1])?.toString());
+    } else {
+      _sodiumTextcontroller = TextEditingController(text: '0');
+    }
+
+    // find sugar in the table text, get the index of the word and get the next double after it
+    int sugarIndex = tableWords.indexWhere((element) => sugar.contains(element.toLowerCase()));
+    if (sugarIndex != -1) {
+      _sugarTextcontroller = TextEditingController(text: extractQuantity(tableWords[sugarIndex + 1])?.toString());
+    } else {
+      _sugarTextcontroller = TextEditingController(text: '0');
+    }
+
+    // find carbohydrates in the table text, get the index of the word and get the next double after it
+    int carbohydratesIndex = tableWords.indexWhere((element) => carbohydates.contains(element.toLowerCase()));
+    if (carbohydratesIndex != -1) {
+      _carbsTextcontroller = TextEditingController(text: extractQuantity(tableWords[carbohydratesIndex + 1])?.toString());
+    } else {
+      _carbsTextcontroller = TextEditingController(text: '0');
+    }
+
+
   }
 
   @override
   Widget build(BuildContext context) {
     List<String> ingredientsMatches =
-    compareWithDataset(widget.ingredientsExtractedText, widget.dataset);
+        compareWithDataset(widget.ingredientsExtractedText, widget.dataset);
 
     return Scaffold(
       appBar: AppBar(
@@ -107,16 +159,16 @@ class _AnalysisPageState extends State<AnalysisPage> {
                     children: checkedCategories
                         .map(
                           (category) => Text(
-                        category,
-                        style: TextStyle(
-                          color: widget.ingredientsExtractedText
-                              .toLowerCase()
-                              .contains(category.toLowerCase())
-                              ? Colors.green
-                              : Colors.transparent,
-                        ),
-                      ),
-                    )
+                            category,
+                            style: TextStyle(
+                              color: widget.ingredientsExtractedText
+                                      .toLowerCase()
+                                      .contains(category.toLowerCase())
+                                  ? Colors.green
+                                  : Colors.transparent,
+                            ),
+                          ),
+                        )
                         .toList(),
                   );
                 }
@@ -174,7 +226,8 @@ class _AnalysisPageState extends State<AnalysisPage> {
     });
   }
 
-  Widget _buildQuantityWidget(String labelText, TextEditingController controller) {
+  Widget _buildQuantityWidget(
+      String labelText, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 130),
       child: TextFormField(
@@ -194,9 +247,9 @@ class _AnalysisPageState extends State<AnalysisPage> {
   }
 
   List<String> compareWithDataset(
-      String extractedText,
-      Map<String, List<String>> dataset,
-      ) {
+    String extractedText,
+    Map<String, List<String>> dataset,
+  ) {
     List<String> matches = [];
 
     for (String key in dataset.keys) {
