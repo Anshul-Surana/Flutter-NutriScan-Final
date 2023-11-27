@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:new_app/main.dart';
 import 'UserProfilesDatabaseHelper.dart';
 import 'dart:io';
 import 'ProfileSettingsPage.dart';
@@ -207,11 +208,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProfileSettingsPage(
-                        initialName: nameController.text,
-                        initialAvatarPath: avatarImagePath,
-                      ),
-                    ),
+                      builder: (context) => const MyHomePage(title: 'NutriScan',passIndex: 2,),
+                  ),
                   );
                 },
                 child: Text('Save'),
